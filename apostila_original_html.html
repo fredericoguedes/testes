@@ -3,6 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Curso Introdutório de IA Generativa para servidores do Ministério Público do Estado de Goiás - Aplicações Práticas para a Gestão Administrativa">
+    <meta name="keywords" content="IA Generativa, GPT, MPGO, Administração Pública, DIGIA, Inteligência Artificial">
+    <meta name="author" content="Ministério Público do Estado de Goiás">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="#1e40af">
     <title>Curso Introdutório de IA Generativa - MPGO</title>
     <style>
         * {
@@ -473,12 +479,129 @@
             border-top: 1px solid var(--border);
         }
 
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            z-index: 99;
+            font-size: 1.5rem;
+            border: none;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--primary-light);
+            transform: translateY(-5px);
+        }
+
+        /* Reading Mode */
+        .reading-mode .sidebar {
+            display: none;
+        }
+
+        .reading-mode .content {
+            max-width: 800px;
+            margin: 2rem auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        /* Focus Mode Toggle */
+        .focus-mode-indicator {
+            position: fixed;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            display: none;
+            z-index: 98;
+        }
+
+        .focus-mode-indicator.active {
+            display: block;
+        }
+
+        /* Keyboard Navigation Hint */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            background: var(--bg-card);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 97;
+        }
+
+        .keyboard-hint.visible {
+            opacity: 1;
+        }
+
+        /* Screen Reader Only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Smooth transitions */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Skip to main content link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            z-index: 1000;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
         /* Print */
         @media print {
-            .header, .sidebar, .header-actions, .mobile-menu-btn, .footer {
-                display: none;
+            .header, .sidebar, .header-actions, .mobile-menu-btn, .footer, .back-to-top, .focus-mode-indicator, .keyboard-hint {
+                display: none !important;
             }
-            
+
             .content {
                 box-shadow: none;
                 padding: 0;
@@ -488,15 +611,26 @@
                 margin: 0;
                 padding: 0;
             }
+
+            .expandable-content {
+                max-height: none !important;
+                padding: 1rem !important;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="progress-container">
+    <a href="#content" class="skip-link">Pular para o conteúdo principal</a>
+
+    <div class="progress-container" role="progressbar" aria-label="Progresso de leitura" aria-valuemin="0" aria-valuemax="100">
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <header class="header">
+    <header class="header" role="banner">
         <div class="header-content">
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
@@ -506,42 +640,45 @@
                 </div>
             </div>
             <div class="header-actions">
-                <button class="btn-icon" onclick="toggleDarkMode()" title="Alternar tema">🌓</button>
-                <button class="btn-icon" onclick="window.print()" title="Imprimir">🖨️</button>
+                <button class="btn-icon" onclick="toggleReadingMode()" title="Modo de leitura" aria-label="Ativar modo de leitura">📖</button>
+                <button class="btn-icon" onclick="toggleDarkMode()" title="Alternar tema" aria-label="Alternar modo escuro">🌓</button>
+                <button class="btn-icon" onclick="increaseFontSize()" title="Aumentar fonte" aria-label="Aumentar tamanho da fonte">A+</button>
+                <button class="btn-icon" onclick="decreaseFontSize()" title="Diminuir fonte" aria-label="Diminuir tamanho da fonte">A-</button>
+                <button class="btn-icon" onclick="window.print()" title="Imprimir" aria-label="Imprimir documento">🖨️</button>
             </div>
         </div>
     </header>
 
     <div class="main-container">
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navegação principal">
             <h3>📚 Navegação</h3>
-            <input type="text" class="search-input" placeholder="🔍 Buscar..." id="searchInput" oninput="searchContent()">
-            <nav>
-                <div class="nav-item active" onclick="scrollToSection('introducao')">
+            <input type="text" class="search-input" placeholder="🔍 Buscar..." id="searchInput" oninput="searchContent()" aria-label="Buscar no documento">
+            <nav role="menu">
+                <div class="nav-item active" onclick="scrollToSection('introducao')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('introducao')">
                     🏠 Introdução
                 </div>
-                <div class="nav-item" onclick="scrollToSection('objetivos')">
+                <div class="nav-item" onclick="scrollToSection('objetivos')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('objetivos')">
                     🎯 Objetivos
                 </div>
-                <div class="nav-item" onclick="scrollToSection('modulo1')">
+                <div class="nav-item" onclick="scrollToSection('modulo1')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('modulo1')">
                     📖 Módulo 1: Fundamentos
                 </div>
-                <div class="nav-item" onclick="scrollToSection('modulo2')">
+                <div class="nav-item" onclick="scrollToSection('modulo2')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('modulo2')">
                     💻 Módulo 2: Uso Prático
                 </div>
-                <div class="nav-item" onclick="scrollToSection('modulo3')">
+                <div class="nav-item" onclick="scrollToSection('modulo3')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('modulo3')">
                     ⚙️ Módulo 3: Customização
                 </div>
-                <div class="nav-item" onclick="scrollToSection('modulo4')">
+                <div class="nav-item" onclick="scrollToSection('modulo4')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('modulo4')">
                     🏆 Módulo 4: Desafio Final
                 </div>
-                <div class="nav-item" onclick="scrollToSection('glossario')">
+                <div class="nav-item" onclick="scrollToSection('glossario')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('glossario')">
                     📝 Glossário
                 </div>
             </nav>
         </aside>
 
-        <main class="content" id="content">
+        <main class="content" id="content" role="main" aria-label="Conteúdo principal">
             <section class="section" id="introducao">
                 <div class="section-header">
                     <span class="section-icon">🎓</span>
@@ -1464,7 +1601,26 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
         <p style="color: var(--text-secondary);">Ministério Público do Estado de Goiás</p>
     </footer>
 
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()" aria-label="Voltar ao topo" title="Voltar ao topo">
+        ↑
+    </button>
+
+    <!-- Keyboard Navigation Hint -->
+    <div class="keyboard-hint" id="keyboardHint">
+        <strong>Atalhos de teclado:</strong><br>
+        ↑/↓ - Navegar seções<br>
+        D - Modo escuro<br>
+        R - Modo leitura<br>
+        H - Mostrar/ocultar ajuda
+    </div>
+
     <script>
+        // Configuration
+        let currentFontSize = 1;
+        let currentSectionIndex = 0;
+        const sectionIds = ['introducao', 'objetivos', 'modulo1', 'modulo2', 'modulo3', 'modulo4', 'glossario'];
+
         // Dark Mode Toggle
         function toggleDarkMode() {
             document.body.classList.toggle('dark-mode');
@@ -1474,6 +1630,41 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
         // Load saved dark mode preference
         if (localStorage.getItem('darkMode') === 'true') {
             document.body.classList.add('dark-mode');
+        }
+
+        // Reading Mode Toggle
+        function toggleReadingMode() {
+            document.body.classList.toggle('reading-mode');
+            localStorage.setItem('readingMode', document.body.classList.contains('reading-mode'));
+        }
+
+        // Load saved reading mode preference
+        if (localStorage.getItem('readingMode') === 'true') {
+            document.body.classList.add('reading-mode');
+        }
+
+        // Font Size Controls
+        function increaseFontSize() {
+            if (currentFontSize < 1.5) {
+                currentFontSize += 0.1;
+                document.documentElement.style.fontSize = currentFontSize + 'rem';
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        }
+
+        function decreaseFontSize() {
+            if (currentFontSize > 0.8) {
+                currentFontSize -= 0.1;
+                document.documentElement.style.fontSize = currentFontSize + 'rem';
+                localStorage.setItem('fontSize', currentFontSize);
+            }
+        }
+
+        // Load saved font size
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+            currentFontSize = parseFloat(savedFontSize);
+            document.documentElement.style.fontSize = currentFontSize + 'rem';
         }
 
         // Mobile Menu Toggle
@@ -1489,26 +1680,33 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
             const section = document.getElementById(sectionId);
             const yOffset = -100;
             const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            
+
             window.scrollTo({ top: y, behavior: 'smooth' });
-            
+
             // Update active nav item
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.target.closest('.nav-item').classList.add('active');
-            
+            if (event && event.target) {
+                event.target.closest('.nav-item')?.classList.add('active');
+            }
+
             // Close mobile menu
             if (window.innerWidth <= 1024) {
                 toggleMenu();
             }
         }
 
+        // Scroll to Top
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         // Toggle Expandable Sections
         function toggleExpandable(header) {
             const content = header.nextElementSibling;
             const icon = header.querySelector('.expand-icon');
-            
+
             content.classList.toggle('active');
             icon.classList.toggle('active');
         }
@@ -1517,7 +1715,7 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
         function searchContent() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const sections = document.querySelectorAll('.section');
-            
+
             sections.forEach(section => {
                 const text = section.textContent.toLowerCase();
                 if (text.includes(searchTerm) || searchTerm === '') {
@@ -1528,31 +1726,130 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
             });
         }
 
-        // Progress Bar
+        // Progress Bar and Back to Top Button
         window.addEventListener('scroll', () => {
             const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
             const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const scrolled = (winScroll / height) * 100;
-            document.getElementById('progressBar').style.width = scrolled + '%';
+            const progressBar = document.getElementById('progressBar');
+            const progressContainer = document.querySelector('.progress-container');
+
+            progressBar.style.width = scrolled + '%';
+            progressContainer.setAttribute('aria-valuenow', Math.round(scrolled));
+
+            // Show/hide back to top button
+            const backToTop = document.getElementById('backToTop');
+            if (winScroll > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
         });
 
         // Update active nav on scroll
         window.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('.section');
             let current = '';
-            
-            sections.forEach(section => {
+
+            sections.forEach((section, index) => {
                 const sectionTop = section.offsetTop;
                 if (window.pageYOffset >= sectionTop - 200) {
                     current = section.getAttribute('id');
+                    currentSectionIndex = sectionIds.indexOf(current);
                 }
             });
-            
+
             document.querySelectorAll('.nav-item').forEach((item, index) => {
                 item.classList.remove('active');
-                const sectionIds = ['introducao', 'objetivos', 'modulo1', 'modulo2', 'modulo3', 'modulo4', 'glossario'];
                 if (sectionIds[index] === current) {
                     item.classList.add('active');
+                }
+            });
+        });
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            // Ignore if user is typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+
+            switch(e.key.toLowerCase()) {
+                case 'd':
+                    toggleDarkMode();
+                    break;
+                case 'r':
+                    toggleReadingMode();
+                    break;
+                case 'h':
+                    const hint = document.getElementById('keyboardHint');
+                    hint.classList.toggle('visible');
+                    break;
+                case 'arrowup':
+                    e.preventDefault();
+                    if (currentSectionIndex > 0) {
+                        scrollToSection(sectionIds[currentSectionIndex - 1]);
+                    }
+                    break;
+                case 'arrowdown':
+                    e.preventDefault();
+                    if (currentSectionIndex < sectionIds.length - 1) {
+                        scrollToSection(sectionIds[currentSectionIndex + 1]);
+                    }
+                    break;
+                case 'home':
+                    e.preventDefault();
+                    scrollToTop();
+                    break;
+                case 'end':
+                    e.preventDefault();
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                    break;
+            }
+        });
+
+        // Show keyboard hint on first load
+        window.addEventListener('load', () => {
+            const keyboardHint = document.getElementById('keyboardHint');
+            setTimeout(() => {
+                keyboardHint.classList.add('visible');
+                setTimeout(() => {
+                    keyboardHint.classList.remove('visible');
+                }, 5000);
+            }, 1000);
+        });
+
+        // Smooth scroll for all internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add ARIA live region for dynamic content updates
+        const liveRegion = document.createElement('div');
+        liveRegion.setAttribute('aria-live', 'polite');
+        liveRegion.setAttribute('aria-atomic', 'true');
+        liveRegion.className = 'sr-only';
+        document.body.appendChild(liveRegion);
+
+        // Announce section changes to screen readers
+        let lastSection = '';
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionId = section.getAttribute('id');
+                if (window.pageYOffset >= sectionTop - 200 && sectionId !== lastSection) {
+                    lastSection = sectionId;
+                    const heading = section.querySelector('h2');
+                    if (heading) {
+                        liveRegion.textContent = 'Navegou para: ' + heading.textContent;
+                    }
                 }
             });
         });
