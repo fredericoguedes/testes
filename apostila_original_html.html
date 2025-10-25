@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso Introdutório de IA Generativa - MPGO</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e40af;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --accent: #f59e0b;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+
+        .dark-mode {
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --secondary: #10b981;
+            --accent: #fbbf24;
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            line-height: 1.7;
+            transition: all 0.3s ease;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .logo p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-icon {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 2rem auto;
+            gap: 2rem;
+            padding: 0 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+            box-shadow: var(--shadow);
+        }
+
+        .sidebar h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .nav-item {
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-item:hover {
+            background: var(--primary-light);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            min-height: 600px;
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .section-icon {
+            font-size: 2rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary);
+            margin: 2rem 0 1rem;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Info Boxes */
+        .info-box {
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .info-box.warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .info-box.danger {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #991b1b;
+        }
+
+        .dark-mode .info-box.info {
+            background: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .dark-mode .info-box.warning {
+            background: #451a03;
+            color: #fbbf24;
+        }
+
+        .dark-mode .info-box.danger {
+            background: #450a0a;
+            color: #fca5a5;
+        }
+
+        .info-box-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-main);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+        }
+
+        thead {
+            background: var(--primary);
+            color: white;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:hover {
+            background: var(--bg-main);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Expandable */
+        .expandable {
+            margin: 1rem 0;
+        }
+
+        .expandable-header {
+            background: var(--primary);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .expandable-header:hover {
+            background: var(--primary-light);
+            transform: translateX(5px);
+        }
+
+        .expandable-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+            background: var(--bg-main);
+            border-radius: 0 0 8px 8px;
+        }
+
+        .expandable-content.active {
+            max-height: 3000px;
+            padding: 1.5rem;
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .expand-icon.active {
+            transform: rotate(180deg);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                position: fixed;
+                left: -300px;
+                top: 0;
+                height: 100vh;
+                z-index: 200;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .main-container {
+                padding: 0 1rem;
+            }
+
+            .content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        /* Overlay */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 150;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-card);
+            padding: 2rem;
+            text-align: center;
+            margin-top: 3rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Print */
+        @media print {
+            .header, .sidebar, .header-actions, .mobile-menu-btn, .footer {
+                display: none;
+            }
+            
+            .content {
+                box-shadow: none;
+                padding: 0;
+            }
+
+            .main-container {
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+                <div class="logo">
+                    <h1>📚 Curso Introdutório de IA Generativa</h1>
+                    <p>Ministério Público do Estado de Goiás</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" onclick="toggleDarkMode()" title="Alternar tema">🌓</button>
+                <button class="btn-icon" onclick="window.print()" title="Imprimir">🖨️</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <aside class="sidebar" id="sidebar">
+            <h3>📚 Navegação</h3>
+            <input type="text" class="search-input" placeholder="🔍 Buscar..." id="searchInput" oninput="searchContent()">
+            <nav>
+                <div class="nav-item active" onclick="scrollToSection('introducao')">
+                    🏠 Introdução
+                </div>
+                <div class="nav-item" onclick="scrollToSection('objetivos')">
+                    🎯 Objetivos
+                </div>
+                <div class="nav-item" onclick="scrollToSection('modulo1')">
+                    📖 Módulo 1: Fundamentos
+                </div>
+                <div class="nav-item" onclick="scrollToSection('modulo2')">
+                    💻 Módulo 2: Uso Prático
+                </div>
+                <div class="nav-item" onclick="scrollToSection('modulo3')">
+                    ⚙️ Módulo 3: Customização
+                </div>
+                <div class="nav-item" onclick="scrollToSection('modulo4')">
+                    🏆 Módulo 4: Desafio Final
+                </div>
+                <div class="nav-item" onclick="scrollToSection('glossario')">
+                    📝 Glossário
+                </div>
+            </nav>
+        </aside>
+
+        <main class="content" id="content">
+            <section class="section" id="introducao">
+                <div class="section-header">
+                    <span class="section-icon">🎓</span>
+                    <div>
+                        <h2>Bem-vindo ao Curso</h2>
+                        <p style="margin: 0; color: var(--text-secondary);">Aplicações Práticas para a Gestão Administrativa</p>
+                    </div>
+                </div>
+
+                <div class="info-box info">
+                    <div class="info-box-title">📋 Informações Gerais</div>
+                    <p><strong>Carga horária:</strong> 4 horas-aula</p>
+                    <p><strong>Local:</strong> Centro de Treinamento do MPGO</p>
+                    <p><strong>Público-alvo:</strong> Servidores administrativos do MPGO</p>
+                    <p><strong>Formato:</strong> Presencial, com computadores disponíveis para prática</p>
+                    <p style="margin-bottom: 0;"><strong>Data:</strong> [Data do Treinamento]</p>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-top: 0;">💬 Mensagem do Diretor Geral</h3>
+                    <p style="font-style: italic; border-left: 4px solid var(--primary); padding-left: 1rem;">
+                        "A implementação e a disponibilização da IA generativa por meio do repositório de GPTs do DIGIA representa um marco na modernização do MPGO. Esta iniciativa não apenas otimiza processos administrativos, mas também libera o potencial criativo e estratégico de nossos servidores ao automatizar tarefas repetitivas. Convido todos a abraçarem esta transformação digital com entusiasmo e responsabilidade."
+                    </p>
+                    <p style="text-align: right; margin-bottom: 0;">
+                        <strong>Frederico Siqueira Guedes Coelho</strong><br>
+                        <span style="color: var(--text-secondary);">Diretor Geral do MPGO</span>
+                    </p>
+                </div>
+            </section>
+
+            <section class="section" id="objetivos">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    <h2>Objetivos do Curso</h2>
+                </div>
+
+                <h3>Objetivo Geral</h3>
+                <p>Capacitar servidores administrativos do MPGO no uso de IA Generativa para otimizar tarefas repetitivas, padronizar documentos e aprimorar a eficiência operacional, utilizando o <strong>DIGIA — Repositório de GPTs Administrativos</strong>.</p>
+
+                <h3>Objetivos Específicos</h3>
+                <div class="card">
+                    <ul>
+                        <li>Compreender os fundamentos da Inteligência Artificial Generativa e suas aplicações no contexto da administração pública</li>
+                        <li>Dominar o uso prático dos GPTs administrativos disponíveis no repositório DIGIA</li>
+                        <li>Desenvolver habilidades para refinamento de prompts e personalização de respostas</li>
+                        <li>Aplicar criticamente a IA em processos administrativos, mantendo o julgamento humano como fator decisivo</li>
+                        <li>Identificar oportunidades de otimização de processos através da IA generativa</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="section" id="modulo1">
+                <div class="section-header">
+                    <span class="section-icon">📖</span>
+                    <h2>Módulo 1: Introdução à IA Generativa</h2>
+                </div>
+
+                <h3>O Que é Inteligência Artificial Generativa?</h3>
+                <p>A Inteligência Artificial Generativa representa uma categoria de sistemas de IA capazes de criar conteúdo novo, como texto, imagens, áudio ou vídeo, a partir de dados com os quais foram treinados. Diferente da IA tradicional que foca em classificar ou prever com base em dados, a IA generativa pode produzir conteúdo original que não existia anteriormente.</p>
+
+                <h4>Características principais:</h4>
+                <ul>
+                    <li>Capacidade de criar conteúdo novo, não apenas classificar existente</li>
+                    <li>Aprendizagem com vastos conjuntos de dados</li>
+                    <li>Geração de resultados contextualmente relevantes</li>
+                    <li>Adaptabilidade a diferentes formatos e necessidades</li>
+                </ul>
+
+                <h3>Modelos GPT (Generative Pre-trained Transformers)</h3>
+                <p>Os modelos GPT são uma família de redes neurais desenvolvidas para processamento de linguagem natural. O termo "Transformer" refere-se à arquitetura específica que permite ao modelo entender e gerar texto de forma contextualizada.</p>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>🔍 Características Técnicas</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <ul>
+                            <li><strong>Arquitetura Transformer:</strong> Mecanismo de atenção que permite ao modelo processar texto considerando o contexto completo</li>
+                            <li><strong>Treinamento em duas fases:</strong> Pré-treinamento com vastos corpora de texto e ajuste fino para tarefas específicas</li>
+                            <li><strong>Compreensão contextual:</strong> Capacidade de manter coerência ao longo de parágrafos extensos</li>
+                            <li><strong>Versatilidade:</strong> Aplicabilidade em diversas tarefas como redação, tradução, resumo e análise</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>Evolução dos modelos GPT:</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Versão</th>
+                                <th>Ano</th>
+                                <th>Parâmetros</th>
+                                <th>Principais melhorias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>GPT-1</td>
+                                <td>2018</td>
+                                <td>117 milhões</td>
+                                <td>Primeira versão do modelo transformer</td>
+                            </tr>
+                            <tr>
+                                <td>GPT-2</td>
+                                <td>2019</td>
+                                <td>1,5 bilhões</td>
+                                <td>Melhorias na geração de texto longo</td>
+                            </tr>
+                            <tr>
+                                <td>GPT-3</td>
+                                <td>2020</td>
+                                <td>175 bilhões</td>
+                                <td>Capacidade de seguir instruções em linguagem natural</td>
+                            </tr>
+                            <tr>
+                                <td>GPT-4</td>
+                                <td>2023</td>
+                                <td>Não divulgado</td>
+                                <td>Multimodalidade, raciocínio avançado, seguimento de instruções complexas</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Aplicações da IA Generativa na Administração Pública</h3>
+                <p>O setor público apresenta características únicas que tornam a IA generativa particularmente valiosa:</p>
+
+                <h4>Benefícios específicos para a administração pública:</h4>
+                <ul>
+                    <li><strong>Padronização:</strong> Uniformidade na elaboração de documentos oficiais</li>
+                    <li><strong>Eficiência:</strong> Redução de tempo em tarefas repetitivas</li>
+                    <li><strong>Conformidade:</strong> Maior aderência a normas e regulamentos</li>
+                    <li><strong>Gestão do conhecimento:</strong> Preservação e disseminação do conhecimento institucional</li>
+                    <li><strong>Qualidade:</strong> Redução de erros em documentos administrativos</li>
+                </ul>
+
+                <h4>Casos de uso no setor público:</h4>
+                <ul>
+                    <li>Elaboração e revisão de documentos oficiais</li>
+                    <li>Preparação de minutas de contratos e editais</li>
+                    <li>Geração de relatórios estruturados</li>
+                    <li>Respostas padronizadas a consultas frequentes</li>
+                    <li>Sistematização de conhecimento normativo</li>
+                </ul>
+
+                <h3>DIGIA: O Repositório de GPTs Administrativos do MPGO</h3>
+                <p>O DIGIA é um repositório centralizado de GPTs especializados para otimizar processos administrativos do MPGO.</p>
+
+                <div class="card">
+                    <h4 style="margin-top: 0;">Estrutura do DIGIA:</h4>
+                    <ul>
+                        <li>Plataforma centralizada e acessível a todos os servidores do MPGO</li>
+                        <li>Interface intuitiva organizada por categorias de assistentes</li>
+                    </ul>
+
+                    <h4>Assistentes disponíveis no DIGIA:</h4>
+                    <ol>
+                        <li>Assistente de redação oficial</li>
+                        <li>Assistente de revisão de textos oficiais</li>
+                        <li>Assistente de contratações públicas</li>
+                        <li>Assistente de gestão de projetos administrativos</li>
+                        <li>Assistente de gestão de rotinas administrativas</li>
+                        <li>Assistente jurídico-administrativo</li>
+                        <li>Assistente de Análise de Contratos Públicos</li>
+                        <li>Assistente jurídico-administrativo - TCU</li>
+                    </ol>
+                </div>
+
+                <h3>Riscos e Limitações: A Importância da Validação Humana</h3>
+                <p>Embora poderosa, a IA generativa apresenta limitações importantes que exigem supervisão humana:</p>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>⚠️ Principais Limitações</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <ul>
+                            <li><strong>Data de corte do conhecimento:</strong> Informações limitadas a seu treinamento</li>
+                            <li><strong>Possibilidade de alucinações:</strong> Geração de informações incorretas com aparência de precisão</li>
+                            <li><strong>Vieses incorporados:</strong> Reprodução de tendências presentes nos dados de treinamento</li>
+                            <li><strong>Falta de raciocínio causal profundo:</strong> Limitações em entendimento do mundo real</li>
+                            <li><strong>Ausência de contexto institucional específico:</strong> Necessidade de orientação para seguir normas particulares do MPGO</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>Melhores práticas de mitigação:</h4>
+                <ul>
+                    <li>Sempre verificar informações factuais e referências legais</li>
+                    <li>Utilizar a IA como ferramenta de apoio, não de decisão final</li>
+                    <li>Revisar criticamente todo conteúdo gerado antes de uso oficial</li>
+                    <li>Fornecer feedback sobre problemas para melhoria contínua</li>
+                    <li>Manter-se atualizado sobre normativas institucionais</li>
+                </ul>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ ATENÇÃO</div>
+                    <p><strong>Todo conteúdo gerado por IA deve passar por revisão humana antes de uso oficial.</strong></p>
+                    <p style="margin-bottom: 0;">O servidor permanece integralmente responsável pelos documentos que produz, mesmo com assistência de IA.</p>
+                </div>
+            </section>
+
+            <section class="section" id="modulo2">
+                <div class="section-header">
+                    <span class="section-icon">💻</span>
+                    <h2>Módulo 2: Uso Prático dos GPTs Administrativos</h2>
+                </div>
+
+                <h3>Fundamentos da Interação com GPTs: Engenharia de Prompts</h3>
+                <p>O termo "prompt" refere-se às instruções fornecidas a um modelo de IA. A qualidade do prompt afeta diretamente a qualidade da resposta gerada.</p>
+
+                <h4>Elementos de um bom prompt:</h4>
+                <ul>
+                    <li><strong>Clareza:</strong> Instruções específicas e diretas</li>
+                    <li><strong>Contexto:</strong> Informações relevantes sobre a situação</li>
+                    <li><strong>Formato:</strong> Especificação do formato desejado para a resposta</li>
+                    <li><strong>Exemplos:</strong> Demonstrações do tipo de resposta esperada</li>
+                    <li><strong>Restrições:</strong> Limitações ou regras a serem seguidas</li>
+                </ul>
+
+                <h4>Técnicas avançadas de engenharia de prompts:</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Técnica</th>
+                                <th>Descrição</th>
+                                <th>Exemplo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Chain-of-Thought</td>
+                                <td>Solicitar raciocínio passo a passo</td>
+                                <td>"Elabore passo a passo a justificativa para esta contratação..."</td>
+                            </tr>
+                            <tr>
+                                <td>Few-Shot Learning</td>
+                                <td>Fornecer exemplos antes da tarefa</td>
+                                <td>"Aqui estão dois exemplos de ofícios bem redigidos: [...] Agora, redija um ofício similar para..."</td>
+                            </tr>
+                            <tr>
+                                <td>Role Prompting</td>
+                                <td>Atribuir um papel específico ao modelo</td>
+                                <td>"Atue como um especialista em licitações com 15 anos de experiência no serviço público..."</td>
+                            </tr>
+                            <tr>
+                                <td>Persona Prompting</td>
+                                <td>Definir características específicas</td>
+                                <td>"Responda como um procurador experiente, considerando todos os aspectos legais..."</td>
+                            </tr>
+                            <tr>
+                                <td>Retrieval Augmentation</td>
+                                <td>Incorporar informações externas</td>
+                                <td>"Considere a Lei 8.666/93, especificamente o artigo 24 que define..."</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h4>Estrutura recomendada para prompts administrativos:</h4>
+                <div class="code-block">1. Contexto: [Informação sobre o órgão, situação atual, requisitos]
+2. Tarefa: [Descrição clara do que precisa ser feito]
+3. Formato desejado: [Estrutura esperada da resposta]
+4. Restrições: [Parâmetros, limitações, requisitos legais]
+5. Exemplos (quando aplicável): [Demonstrações do resultado esperado]</div>
+
+                <h3>Assistentes Disponíveis no DIGIA</h3>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>📝 1. Assistente de Revisão de Textos Oficiais</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Analisar documentos administrativos para identificar e corrigir erros ortográficos, gramaticais, de formatação e adequação à norma culta e padrões institucionais.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Correção ortográfica e gramatical</li>
+                            <li>Verificação de formatação conforme Manual de Redação do MPGO</li>
+                            <li>Sugestões de clareza e concisão</li>
+                            <li>Identificação de terminologias inadequadas ao contexto oficial</li>
+                            <li>Análise de coerência e coesão textual</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Revise o seguinte memorando identificando todos os erros e inadequações:
+
+[TEXTO DO MEMORANDO]
+
+Apresente o resultado em duas partes:
+1. Texto revisado com as correções aplicadas
+2. Lista de problemas encontrados e recomendações para evitá-los no futuro</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>✍️ 2. Assistente de Redação Oficial</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Auxiliar na criação de documentos administrativos padronizados conforme as normas do MPGO e da administração pública.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Elaboração de minutas de documentos administrativos</li>
+                            <li>Formatação segundo padrões oficiais</li>
+                            <li>Adequação do tom e registro formal</li>
+                            <li>Incorporação de referências normativas quando necessário</li>
+                            <li>Estruturação lógica de conteúdos complexos</li>
+                        </ul>
+
+                        <h4>Tipos de documentos suportados:</h4>
+                        <ul>
+                            <li>Ofícios</li>
+                            <li>Memorandos</li>
+                            <li>Pareceres</li>
+                            <li>Relatórios</li>
+                            <li>Atas</li>
+                            <li>Despachos</li>
+                            <li>Portarias</li>
+                            <li>Notificações</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Elabore um ofício para a Secretaria de Administração do Estado solicitando informações sobre o andamento do processo administrativo nº 123456/2025, referente à parceria institucional para capacitação de servidores.
+
+O ofício deve ser assinado pelo Dr. [Nome], Procurador-Geral de Justiça, e deve mencionar que o prazo para resposta é de 15 dias úteis.</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>⚖️ 3. Assistente Jurídico Administrativo</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Fornecer apoio em análises preliminares de questões jurídicas relacionadas a processos administrativos.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Análise de fundamentação legal para atos administrativos</li>
+                            <li>Elaboração de pareceres preliminares sobre questões administrativas</li>
+                            <li>Pesquisa e compilação de normas aplicáveis a casos específicos</li>
+                            <li>Verificação de conformidade com requisitos legais</li>
+                            <li>Sistematização de informações jurídicas para tomada de decisão</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Elabore uma análise preliminar sobre a possibilidade de o MPGO ceder um servidor efetivo para outro órgão ou entidade pública. Quais são os requisitos para que essa cessão ocorra dentro da legalidade?
+
+Considere:
+- Servidor efetivo estável;
+- Necessidade temporária;
+- Interesse da administração.
+
+Inclua fundamentação legal aplicável.</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>⚖️ 4. Assistente de Análise de Contratos Públicos</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Oferece suporte técnico-jurídico em questões relativas a contratos públicos, com fundamento na Lei nº 14.133/2021 e na jurisprudência do TCU.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Análise de minutas de contratos e suas cláusulas</li>
+                            <li>Identificação de riscos e cláusulas exorbitantes ou nulas</li>
+                            <li>Verificação da conformidade do contrato com o edital e a proposta vencedora</li>
+                            <li>Análise de pedidos de reequilíbrio econômico-financeiro</li>
+                            <li>Suporte na interpretação de cláusulas contratuais durante a execução</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Analise a seguinte cláusula de um contrato de prestação de serviços de limpeza e conservação e identifique possíveis riscos para a Administração, com base na Lei 14.133/2021:
+
+"Cláusula 15ª - DA REPACTUAÇÃO DE PREÇOS: A CONTRATADA poderá solicitar a repactuação de preços a qualquer tempo, desde que comprove a variação dos custos dos insumos."
+
+Aponte se a cláusula está em conformidade com a legislação e sugira uma redação mais segura para o MPGO.</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>⚖️ 5. Assistente Jurídico-Administrativo - TCU</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Oferece orientação especializada em questões relacionadas às normativas e jurisprudências do Tribunal de Contas da União.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Pesquisa de acórdãos e jurisprudência do TCU sobre temas específicos</li>
+                            <li>Análise de processos administrativos à luz das exigências do TCU</li>
+                            <li>Elaboração de respostas a diligências e notificações do TCU</li>
+                            <li>Orientação sobre procedimentos de tomada de contas especial</li>
+                            <li>Verificação de conformidade de gastos e contratações com as normas de controle externo</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Qual a posição do Tribunal de Contas da União (TCU) a respeito dos requisitos para a contratação direta, por inexigibilidade de licitação, de serviços de publicidade e divulgação?
+
+Apresente o resultado em tópicos, destacando os principais pontos de atenção que o gestor público deve observar para evitar questionamentos pelo órgão de controle.</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>📋 6. Assistente de Contratações Públicas</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Auxiliar nos processos de contratação pública, desde o planejamento até a gestão contratual.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Elaboração de termos de referência e projetos básicos</li>
+                            <li>Análise de requisitos para diferentes modalidades licitatórias</li>
+                            <li>Verificação de conformidade com legislação de compras públicas</li>
+                            <li>Suporte na elaboração de editais e contratos</li>
+                            <li>Orientação sobre fiscalização e gestão contratual</li>
+                        </ul>
+
+                        <h4>Exemplo de uso 1:</h4>
+                        <div class="code-block">Solicito a elaboração dos documentos DOD (Documento de Oficialização da Demanda), ETP (Estudo Técnico Preliminar) e TR (Termo de Referência), visando à aquisição de 200 cadeiras giratórias de espaldar alto, telada e com apoio lombar regulável.
+
+Solicito, ainda, que os referidos documentos sejam elaborados com base nos modelos padronizados do MPGO, com o pré-preenchimento integral dos campos cabíveis, utilizando critérios técnicos e razoáveis, a fim de viabilizar posterior complementação por esta unidade.</div>
+
+                        <h4>Exemplo de uso 2:</h4>
+                        <div class="code-block">Elabore um checklist completo para verificação de conformidade de um processo de contratação direta por inexigibilidade de licitação para serviços de treinamento especializado.
+
+Inclua todas as etapas necessárias, desde a justificativa da contratação até a publicação do extrato de contrato, com base na Lei 14.133/2021 (Nova Lei de Licitações).</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>📊 7. Assistente de Gestão de Projetos Administrativos</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Apoiar o planejamento, execução, monitoramento e avaliação de projetos administrativos.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Estruturação de documentos de projeto (termo de abertura, planos)</li>
+                            <li>Elaboração de cronogramas e planos de ação</li>
+                            <li>Desenvolvimento de indicadores de desempenho</li>
+                            <li>Modelos para relatórios de status e prestação de contas</li>
+                            <li>Suporte à análise de riscos e oportunidades</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Crie um modelo de Termo de Abertura de Projeto (TAP) para implementação de um novo sistema de controle de acesso por meio de catracas eletrônicas na Sede do MPGO.
+
+O projeto tem duração estimada de 8 meses, orçamento previsto de R$ 350.000,00 e envolverá as áreas de Segurança, Tecnologia da Informação e Administrativa.
+
+Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMBoK, adaptadas ao contexto do serviço público.</div>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>📌 8. Assistente de Gestão de Rotinas Administrativas</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <p><strong>Finalidade:</strong> Otimizar processos administrativos do dia a dia, com foco em padronização e eficiência.</p>
+                        
+                        <h4>Capacidades:</h4>
+                        <ul>
+                            <li>Elaboração de fluxogramas e mapeamentos de processo</li>
+                            <li>Criação de procedimentos operacionais padrão (POPs)</li>
+                            <li>Desenvolvimento de checklists para atividades rotineiras</li>
+                            <li>Modelos para documentação de rotinas administrativas</li>
+                            <li>Sugestões de otimização de fluxos de trabalho</li>
+                        </ul>
+
+                        <h4>Exemplo de uso:</h4>
+                        <div class="code-block">Mapear o processo de Organização de Evento Institucional realizado pela Assessoria de Cerimonial da Procuradoria-Geral de Justiça, gerando o arquivo do resultado, contendo, no mínimo:
+
+- Descrição detalhada de cada etapa
+- Responsáveis por cada ação
+- Prazos para cada etapa
+- Documentos necessários
+- Fluxograma do processo</div>
+                    </div>
+                </div>
+
+                <h3>Demonstração Prática: Testando os GPTs do DIGIA</h3>
+                <p>Durante o treinamento, serão realizadas demonstrações práticas de cada assistente, seguindo um roteiro estruturado:</p>
+                <ol>
+                    <li><strong>Acesso ao sistema:</strong> Navegação no repositório DIGIA</li>
+                    <li><strong>Seleção do assistente:</strong> Escolha do GPT adequado para a tarefa</li>
+                    <li><strong>Formulação do prompt:</strong> Elaboração da instrução seguindo as melhores práticas</li>
+                    <li><strong>Análise da resposta:</strong> Avaliação crítica do conteúdo gerado</li>
+                    <li><strong>Refinamento:</strong> Ajustes no prompt para melhorar a resposta</li>
+                    <li><strong>Aplicação prática:</strong> Incorporação do conteúdo ao fluxo de trabalho</li>
+                </ol>
+
+                <div class="info-box info">
+                    <div class="info-box-title">💡 DICA PRÁTICA</div>
+                    <p>Experimente iniciar com prompts simples e ir adicionando complexidade gradualmente.</p>
+                    <p style="margin-bottom: 0;">Compare diferentes versões de prompts para a mesma tarefa para identificar o que funciona melhor.</p>
+                </div>
+            </section>
+
+            <section class="section" id="modulo3">
+                <div class="section-header">
+                    <span class="section-icon">⚙️</span>
+                    <h2>Módulo 3: Customização e Melhoria Contínua dos GPTs</h2>
+                </div>
+
+                <h3>Personalização de Respostas para Necessidades Específicas</h3>
+                <p>A personalização permite adaptar os assistentes GPT às necessidades específicas de cada departamento ou tipo de documento.</p>
+
+                <h4>Estratégias de personalização:</h4>
+                <ol>
+                    <li><strong>Definição de contexto institucional</strong>
+                        <ul>
+                            <li>Incorporar informações específicas do MPGO</li>
+                            <li>Mencionar normativas internas relevantes</li>
+                            <li>Especificar o departamento e suas particularidades</li>
+                        </ul>
+                    </li>
+                    <li><strong>Especificação de formato e estilo</strong>
+                        <ul>
+                            <li>Definir estrutura documental desejada</li>
+                            <li>Especificar nível de formalidade</li>
+                            <li>Indicar preferências de formato (tópicos, texto corrido, etc.)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Inclusão de exemplos</strong>
+                        <ul>
+                            <li>Fornecer modelos do resultado esperado</li>
+                            <li>Demonstrar estilos de escrita preferidos</li>
+                            <li>Apresentar casos bem-sucedidos anteriores</li>
+                        </ul>
+                    </li>
+                    <li><strong>Instruções negativas</strong>
+                        <ul>
+                            <li>Indicar o que deve ser evitado</li>
+                            <li>Especificar terminologias não recomendadas</li>
+                            <li>Alertar sobre erros comuns a serem evitados</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h4>Exemplo de personalização para um departamento específico:</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Elemento</th>
+                                <th>Prompt Genérico</th>
+                                <th>Prompt Personalizado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Contexto</td>
+                                <td>"Elabore um memorando..."</td>
+                                <td>"Elabore um memorando da Superintendência de Gestão em Recursos Humanos do MPGO, considerando a Portaria nº 45/2024 que estabelece novos procedimentos..."</td>
+                            </tr>
+                            <tr>
+                                <td>Estilo</td>
+                                <td>"Redija em linguagem formal..."</td>
+                                <td>"Utilize o padrão conciso característico dos documentos da CGMP, com parágrafos de até 3 linhas e uso de marcadores para listar requisitos..."</td>
+                            </tr>
+                            <tr>
+                                <td>Exemplo</td>
+                                <td>Não fornecido</td>
+                                <td>"Siga o modelo do memorando CGMP nº 123/2024 anexo, mantendo a mesma estrutura e tom..."</td>
+                            </tr>
+                            <tr>
+                                <td>Restrições</td>
+                                <td>Não especificadas</td>
+                                <td>"Evite o uso de termos técnicos sem explicação, expressões em latim e referências à legislação sem citação completa..."</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Ciclos de Feedback para Refinamento Contínuo</h3>
+                <p>A melhoria dos assistentes GPT depende do feedback contínuo dos usuários. O DIGIA poderá ser melhorado com implementação desse feedback.</p>
+
+                <h4>Fluxo de feedback no DIGIA:</h4>
+                <div style="background: var(--bg-main); padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <ol>
+                        <li><strong>Identificação de oportunidades de melhoria</strong>
+                            <ul>
+                                <li>Respostas inadequadas ou incorretas</li>
+                                <li>Necessidades não atendidas</li>
+                                <li>Sugestões de novos recursos</li>
+                            </ul>
+                        </li>
+                        <li><strong>Registro e categorização</strong>
+                            <ul>
+                                <li>Classificação por tipo de problema/sugestão</li>
+                                <li>Nível de prioridade</li>
+                            </ul>
+                        </li>
+                        <li><strong>Análise e implementação</strong>
+                            <ul>
+                                <li>Avaliação técnica da viabilidade</li>
+                                <li>Ajustes nos prompts-base dos assistentes</li>
+                                <li>Atualizações de parâmetros</li>
+                            </ul>
+                        </li>
+                        <li><strong>Verificação e comunicação</strong>
+                            <ul>
+                                <li>Validação das melhorias implementadas</li>
+                                <li>Comunicação aos usuários sobre atualizações</li>
+                                <li>Documentação das mudanças</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+
+                <h4>Critérios para avaliação da qualidade das respostas:</h4>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Dimensão</th>
+                                <th>Aspectos a Avaliar</th>
+                                <th>Questões de Verificação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Precisão</td>
+                                <td>Correção factual e técnica</td>
+                                <td>O conteúdo está tecnicamente correto? As informações legais são precisas?</td>
+                            </tr>
+                            <tr>
+                                <td>Adequação</td>
+                                <td>Conformidade com requisitos</td>
+                                <td>A resposta atende ao solicitado? Segue os padrões institucionais?</td>
+                            </tr>
+                            <tr>
+                                <td>Clareza</td>
+                                <td>Compreensibilidade</td>
+                                <td>O texto é claro e objetivo? Evita ambiguidades e jargões desnecessários?</td>
+                            </tr>
+                            <tr>
+                                <td>Completude</td>
+                                <td>Abrangência</td>
+                                <td>Todos os pontos solicitados foram abordados? Há informações importantes faltando?</td>
+                            </tr>
+                            <tr>
+                                <td>Aplicabilidade</td>
+                                <td>Utilidade prática</td>
+                                <td>A resposta pode ser aplicada diretamente? São necessários muitos ajustes?</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3>Segurança e Ética no Uso de IA no Serviço Público</h3>
+                <p>O uso de IA no contexto do serviço público exige atenção redobrada a questões éticas e de segurança.</p>
+
+                <h4>Princípios éticos fundamentais:</h4>
+                <ul>
+                    <li><strong>Transparência:</strong> Clareza sobre quando e como a IA está sendo utilizada</li>
+                    <li><strong>Responsabilidade:</strong> Manutenção da responsabilidade humana pelas decisões</li>
+                    <li><strong>Equidade:</strong> Identificação e mitigação de vieses potenciais</li>
+                    <li><strong>Privacidade:</strong> Proteção de dados pessoais e institucionais</li>
+                    <li><strong>Segurança:</strong> Prevenção de vulnerabilidades e usos indevidos</li>
+                </ul>
+
+                <h4>Diretrizes práticas para uso seguro e ético:</h4>
+                <ol>
+                    <li><strong>Proteção de dados sensíveis</strong>
+                        <ul>
+                            <li>Nunca inserir informações pessoais, sigilosas ou classificadas</li>
+                            <li>Remover dados identificadores antes de usar o sistema</li>
+                            <li>Estar ciente das políticas de privacidade dos provedores de IA</li>
+                        </ul>
+                    </li>
+                    <li><strong>Validação humana</strong>
+                        <ul>
+                            <li>Revisão crítica de todo conteúdo gerado antes do uso oficial</li>
+                            <li>Verificação de fontes e embasamento legal</li>
+                            <li>Contextualização das informações ao caso específico</li>
+                        </ul>
+                    </li>
+                    <li><strong>Uso proporcional</strong>
+                        <ul>
+                            <li>Aplicar IA apenas para tarefas apropriadas</li>
+                            <li>Manter supervisão humana em decisões com impacto significativo</li>
+                            <li>Balancear automação e intervenção humana</li>
+                        </ul>
+                    </li>
+                    <li><strong>Documentação e rastreabilidade</strong>
+                        <ul>
+                            <li>Registrar os casos de uso da IA</li>
+                            <li>Manter histórico de prompts e respostas importantes</li>
+                            <li>Documentar as revisões e alterações realizadas</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <div class="info-box danger">
+                    <div class="info-box-title">⚠️ ATENÇÃO: RESPONSABILIDADE LEGAL</div>
+                    <p>O uso de assistentes de IA não transfere a responsabilidade profissional e legal do servidor.</p>
+                    <p style="margin-bottom: 0;"><strong>Todo documento oficial gerado com auxílio de IA permanece sob responsabilidade integral do servidor que o assina ou utiliza.</strong></p>
+                </div>
+            </section>
+
+            <section class="section" id="modulo4">
+                <div class="section-header">
+                    <span class="section-icon">🏆</span>
+                    <h2>Módulo 4: Desafio Final e Discussão</h2>
+                </div>
+
+                <h3>Atividade Prática Integradora</h3>
+                <p>Para consolidar o aprendizado, os participantes realizarão um desafio prático que integra os conhecimentos adquiridos durante o curso.</p>
+
+                <h4>Opções de desafio:</h4>
+                
+                <div class="card">
+                    <h4 style="margin-top: 0;">1. Elaboração de documento oficial</h4>
+                    <ul>
+                        <li>Redigir um ofício, memorando ou parecer sobre tema relevante para sua área</li>
+                        <li>Utilizar o Assistente de Redação Oficial, aplicando técnicas avançadas de prompting</li>
+                        <li>Revisar e aprimorar o documento com o Assistente de Revisão de Textos</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4 style="margin-top: 0;">2. Revisão e padronização</h4>
+                    <ul>
+                        <li>Analisar documento existente com problemas de formatação e conteúdo</li>
+                        <li>Utilizar o Assistente de Revisão para identificar inconsistências</li>
+                        <li>Reformular o documento seguindo os padrões institucionais</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h4 style="margin-top: 0;">3. Desenvolvimento de procedimento administrativo</h4>
+                    <ul>
+                        <li>Mapear um processo administrativo do seu setor</li>
+                        <li>Utilizar o Assistente de Gestão de Rotinas Administrativas</li>
+                        <li>Criar um POP (Procedimento Operacional Padrão) detalhado</li>
+                    </ul>
+                </div>
+
+                <h4>Roteiro da atividade:</h4>
+                <ol>
+                    <li>Escolher um dos desafios conforme sua área de atuação</li>
+                    <li>Planejar a abordagem e definir os assistentes a serem utilizados</li>
+                    <li>Elaborar prompts estruturados seguindo as boas práticas</li>
+                    <li>Executar a tarefa e avaliar os resultados</li>
+                    <li>Identificar pontos de melhoria no processo</li>
+                    <li>Apresentar brevemente os resultados para o grupo</li>
+                </ol>
+
+                <h3>Discussão Reflexiva: O Futuro da IA na Administração Pública</h3>
+                <p>Uma discussão moderada será conduzida para explorar questões relevantes sobre o impacto da IA no MPGO e na administração pública em geral.</p>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>💭 1. Transformação Digital e IA</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <ul>
+                            <li>Como integrar a IA na estratégia de transformação digital do MPGO?</li>
+                            <li>Quais processos deveriam ser priorizados para aplicação de IA?</li>
+                            <li>Como mensurar o retorno sobre investimento em IA?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>⚠️ 2. Desafios e Limitações</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <ul>
+                            <li>Quais são as principais barreiras para adoção plena da IA no MPGO?</li>
+                            <li>Como lidar com resistências culturais à adoção tecnológica?</li>
+                            <li>Quais riscos precisam ser mais bem gerenciados?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>👥 3. Impactos no Trabalho</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <ul>
+                            <li>Como a IA pode transformar as funções administrativas?</li>
+                            <li>Quais novas competências serão valorizadas neste cenário?</li>
+                            <li>Como realocar o tempo liberado pela automação para atividades de maior valor?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="expandable">
+                    <div class="expandable-header" onclick="toggleExpandable(this)">
+                        <span>🚀 4. Perspectivas Futuras</span>
+                        <span class="expand-icon">▼</span>
+                    </div>
+                    <div class="expandable-content">
+                        <ul>
+                            <li>Quais serão os próximos desenvolvimentos tecnológicos relevantes?</li>
+                            <li>Como o MPGO pode se preparar para futuros avanços da IA?</li>
+                            <li>Que oportunidades de inovação podem ser exploradas?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h4>Formato da discussão:</h4>
+                <ul>
+                    <li>Perguntas orientadoras apresentadas pelo facilitador</li>
+                    <li>Contribuições voluntárias dos participantes</li>
+                    <li>Síntese dos principais insights</li>
+                    <li>Identificação de ações potenciais</li>
+                </ul>
+            </section>
+
+            <section class="section" id="glossario">
+                <div class="section-header">
+                    <span class="section-icon">📝</span>
+                    <h2>Glossário de Termos</h2>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 30%;">Termo</th>
+                                <th>Definição</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>IA Generativa</strong></td>
+                                <td>Categoria de inteligência artificial capaz de criar conteúdo novo como texto, imagens ou áudio baseado em dados de treinamento.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>GPT</strong></td>
+                                <td>Generative Pre-trained Transformer - Modelo de IA baseado na arquitetura transformer, pré-treinado para geração de texto.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Prompt</strong></td>
+                                <td>Instrução ou pergunta fornecida a um modelo de IA para obter uma resposta.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Prompt Engineering</strong></td>
+                                <td>Prática de formular instruções para modelos de IA de forma a obter respostas otimizadas.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>DIGIA</strong></td>
+                                <td>Repositório de GPTs administrativos, mantidos pela DG do MPGO.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Fine-tuning</strong></td>
+                                <td>Processo de ajustar um modelo pré-treinado para tarefas específicas com dados adicionais.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Token</strong></td>
+                                <td>Unidade básica de processamento em modelos de linguagem, podendo ser uma palavra, parte de palavra ou caractere.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Alucinação</strong></td>
+                                <td>Fenômeno onde modelos de IA geram informações incorretas ou fictícias apresentadas como fatos.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chain-of-Thought</strong></td>
+                                <td>Técnica que induz o modelo a mostrar seu processo de raciocínio em etapas.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Few-Shot Learning</strong></td>
+                                <td>Abordagem onde o modelo aprende a partir de poucos exemplos fornecidos no prompt.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Modelo de Base</strong></td>
+                                <td>Modelo de IA fundamental antes de qualquer especialização para tarefas específicas.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Viés (Bias)</strong></td>
+                                <td>Tendências ou inclinações presentes nos dados de treinamento que podem se refletir nas respostas do modelo.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>RAG (Retrieval Augmented Generation)</strong></td>
+                                <td>Técnica que combina recuperação de informações externas com geração de texto.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Embeddings</strong></td>
+                                <td>Representações vetoriais de palavras ou conceitos que capturam significado semântico.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <footer class="footer">
+        <p><strong>Curso Introdutório de IA Generativa para o MPGO</strong></p>
+        <p style="margin: 0.5rem 0;">Aplicações Práticas para a Gestão Administrativa</p>
+        <p style="color: var(--text-secondary);">Ministério Público do Estado de Goiás</p>
+    </footer>
+
+    <script>
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        // Load saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Mobile Menu Toggle
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Scroll to Section
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            const yOffset = -100;
+            const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            
+            window.scrollTo({ top: y, behavior: 'smooth' });
+            
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.nav-item').classList.add('active');
+            
+            // Close mobile menu
+            if (window.innerWidth <= 1024) {
+                toggleMenu();
+            }
+        }
+
+        // Toggle Expandable Sections
+        function toggleExpandable(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.expand-icon');
+            
+            content.classList.toggle('active');
+            icon.classList.toggle('active');
+        }
+
+        // Search Content
+        function searchContent() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const sections = document.querySelectorAll('.section');
+            
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+        }
+
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // Update active nav on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            document.querySelectorAll('.nav-item').forEach((item, index) => {
+                item.classList.remove('active');
+                const sectionIds = ['introducao', 'objetivos', 'modulo1', 'modulo2', 'modulo3', 'modulo4', 'glossario'];
+                if (sectionIds[index] === current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
