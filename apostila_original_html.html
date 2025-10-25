@@ -596,6 +596,28 @@
             top: 0;
         }
 
+        /* Search Results */
+        .search-results-count {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 0.5rem;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .highlight {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 0.1rem 0.2rem;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
+        .dark-mode .highlight {
+            background-color: #713f12;
+            color: #fef08a;
+        }
+
         /* Print */
         @media print {
             .header, .sidebar, .header-actions, .mobile-menu-btn, .footer, .back-to-top, .focus-mode-indicator, .keyboard-hint {
@@ -653,6 +675,7 @@
         <aside class="sidebar" id="sidebar" role="navigation" aria-label="Navegação principal">
             <h3>📚 Navegação</h3>
             <input type="text" class="search-input" placeholder="🔍 Buscar..." id="searchInput" oninput="searchContent()" aria-label="Buscar no documento">
+            <div class="search-results-count" id="searchResultsCount"></div>
             <nav role="menu">
                 <div class="nav-item active" onclick="scrollToSection('introducao')" role="menuitem" tabindex="0" onkeypress="if(event.key==='Enter') scrollToSection('introducao')">
                     🏠 Introdução
@@ -1712,18 +1735,120 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
         }
 
         // Search Content
+        let searchTimeout;
         function searchContent() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const sections = document.querySelectorAll('.section');
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                const searchResultsCount = document.getElementById('searchResultsCount');
+                const content = document.getElementById('content');
 
-            sections.forEach(section => {
-                const text = section.textContent.toLowerCase();
-                if (text.includes(searchTerm) || searchTerm === '') {
-                    section.style.display = 'block';
+                // Clear previous highlights
+                clearHighlights();
+
+                if (searchTerm === '') {
+                    searchResultsCount.textContent = '';
+                    // Show all sections
+                    document.querySelectorAll('.section').forEach(section => {
+                        section.style.display = 'block';
+                    });
+                    return;
+                }
+
+                // Search and highlight
+                let matchCount = 0;
+                let firstMatch = null;
+                const sections = document.querySelectorAll('.section');
+
+                sections.forEach(section => {
+                    const sectionText = section.textContent.toLowerCase();
+                    if (sectionText.includes(searchTerm.toLowerCase())) {
+                        section.style.display = 'block';
+
+                        // Highlight matches
+                        const matches = highlightInElement(section, searchTerm);
+                        matchCount += matches;
+
+                        if (matches > 0 && !firstMatch) {
+                            firstMatch = section;
+                        }
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+
+                // Update results count
+                if (matchCount > 0) {
+                    searchResultsCount.textContent = `${matchCount} resultado${matchCount > 1 ? 's' : ''} encontrado${matchCount > 1 ? 's' : ''}`;
+
+                    // Scroll to first match
+                    if (firstMatch) {
+                        const yOffset = -100;
+                        const y = firstMatch.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                        window.scrollTo({ top: y, behavior: 'smooth' });
+                    }
                 } else {
-                    section.style.display = 'none';
+                    searchResultsCount.textContent = 'Nenhum resultado encontrado';
+                }
+            }, 300); // Debounce para melhor performance
+        }
+
+        function highlightInElement(element, searchTerm) {
+            let matchCount = 0;
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                {
+                    acceptNode: function(node) {
+                        // Skip script and style tags
+                        if (node.parentElement.tagName === 'SCRIPT' ||
+                            node.parentElement.tagName === 'STYLE' ||
+                            node.parentElement.classList.contains('search-results-count')) {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        return NodeFilter.FILTER_ACCEPT;
+                    }
+                }
+            );
+
+            const nodesToProcess = [];
+            while (walker.nextNode()) {
+                nodesToProcess.push(walker.currentNode);
+            }
+
+            nodesToProcess.forEach(node => {
+                const text = node.textContent;
+                const lowerText = text.toLowerCase();
+                const lowerSearchTerm = searchTerm.toLowerCase();
+
+                if (lowerText.includes(lowerSearchTerm)) {
+                    const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+                    const matches = text.match(regex);
+                    if (matches) {
+                        matchCount += matches.length;
+                        const span = document.createElement('span');
+                        span.innerHTML = text.replace(regex, '<span class="highlight">$1</span>');
+                        node.parentNode.replaceChild(span, node);
+                    }
                 }
             });
+
+            return matchCount;
+        }
+
+        function clearHighlights() {
+            document.querySelectorAll('.highlight').forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.replaceWith(document.createTextNode(parent.textContent));
+            });
+
+            // Normalize text nodes
+            const content = document.getElementById('content');
+            content.normalize();
+        }
+
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
 
         // Progress Bar and Back to Top Button
