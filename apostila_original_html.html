@@ -160,6 +160,84 @@
             border-color: var(--primary);
         }
 
+        /* Search Results Navigation */
+        .search-controls {
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-main);
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+        }
+
+        .search-controls.active {
+            display: flex;
+        }
+
+        .search-counter {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .search-nav-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .search-nav-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-nav-btn:hover:not(:disabled) {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .search-nav-btn:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Search Highlighting */
+        .search-highlight {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode .search-highlight {
+            background-color: #713f12;
+            color: #fef08a;
+        }
+
+        .search-highlight-current {
+            background-color: #fb923c;
+            color: white;
+            padding: 0.1rem 0.2rem;
+            border-radius: 3px;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.3);
+        }
+
+        .dark-mode .search-highlight-current {
+            background-color: #f97316;
+            color: white;
+        }
+
         .nav-item {
             padding: 0.75rem 1rem;
             margin: 0.25rem 0;
@@ -516,6 +594,13 @@
         <aside class="sidebar" id="sidebar">
             <h3>📚 Navegação</h3>
             <input type="text" class="search-input" placeholder="🔍 Buscar..." id="searchInput" oninput="searchContent()">
+            <div class="search-controls" id="searchControls">
+                <div class="search-counter" id="searchCounter">0 resultados</div>
+                <div class="search-nav-buttons">
+                    <button class="search-nav-btn" id="prevResult" onclick="previousSearchResult()" disabled>⬆️ Anterior</button>
+                    <button class="search-nav-btn" id="nextResult" onclick="nextSearchResult()" disabled>⬇️ Próximo</button>
+                </div>
+            </div>
             <nav>
                 <div class="nav-item active" onclick="scrollToSection('introducao')">
                     🏠 Introdução
@@ -1513,19 +1598,192 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
             icon.classList.toggle('active');
         }
 
-        // Search Content
+        // Search variables
+        let searchMatches = [];
+        let currentMatchIndex = -1;
+        let originalContent = null;
+
+        // Search Content with highlighting
         function searchContent() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const sections = document.querySelectorAll('.section');
-            
-            sections.forEach(section => {
-                const text = section.textContent.toLowerCase();
-                if (text.includes(searchTerm) || searchTerm === '') {
-                    section.style.display = 'block';
-                } else {
-                    section.style.display = 'none';
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const content = document.getElementById('content');
+            const searchControls = document.getElementById('searchControls');
+            const searchCounter = document.getElementById('searchCounter');
+
+            // Clear previous search
+            clearSearch();
+
+            // If search is empty, restore original content
+            if (searchTerm === '') {
+                searchControls.classList.remove('active');
+                return;
+            }
+
+            // Save original content if not saved yet
+            if (originalContent === null) {
+                originalContent = content.innerHTML;
+            }
+
+            // Perform search and highlight
+            searchMatches = [];
+            highlightSearchTerm(content, searchTerm);
+
+            // Get all highlighted elements
+            const highlights = document.querySelectorAll('.search-highlight');
+            searchMatches = Array.from(highlights);
+
+            // Update UI
+            if (searchMatches.length > 0) {
+                searchControls.classList.add('active');
+                searchCounter.textContent = `${searchMatches.length} resultado${searchMatches.length > 1 ? 's' : ''}`;
+                currentMatchIndex = 0;
+                highlightCurrentMatch();
+                scrollToCurrentMatch();
+                updateNavigationButtons();
+            } else {
+                searchControls.classList.remove('active');
+                searchCounter.textContent = 'Nenhum resultado';
+            }
+        }
+
+        // Highlight search term in element
+        function highlightSearchTerm(element, searchTerm) {
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                {
+                    acceptNode: function(node) {
+                        // Skip if parent is script, style, or already highlighted
+                        if (node.parentElement.tagName === 'SCRIPT' ||
+                            node.parentElement.tagName === 'STYLE' ||
+                            node.parentElement.classList.contains('search-highlight') ||
+                            node.parentElement.classList.contains('search-highlight-current')) {
+                            return NodeFilter.FILTER_REJECT;
+                        }
+                        return NodeFilter.FILTER_ACCEPT;
+                    }
+                }
+            );
+
+            const nodesToReplace = [];
+            let currentNode;
+
+            // Collect text nodes that contain the search term
+            while (currentNode = walker.nextNode()) {
+                if (currentNode.textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    nodesToReplace.push(currentNode);
+                }
+            }
+
+            // Replace text nodes with highlighted version
+            nodesToReplace.forEach(node => {
+                const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
+                const text = node.textContent;
+                const matches = text.match(regex);
+
+                if (matches) {
+                    const fragment = document.createDocumentFragment();
+                    let lastIndex = 0;
+
+                    text.replace(regex, (match, p1, offset) => {
+                        // Add text before match
+                        if (offset > lastIndex) {
+                            fragment.appendChild(document.createTextNode(text.slice(lastIndex, offset)));
+                        }
+
+                        // Add highlighted match
+                        const span = document.createElement('span');
+                        span.className = 'search-highlight';
+                        span.textContent = match;
+                        fragment.appendChild(span);
+
+                        lastIndex = offset + match.length;
+                    });
+
+                    // Add remaining text
+                    if (lastIndex < text.length) {
+                        fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+                    }
+
+                    node.parentNode.replaceChild(fragment, node);
                 }
             });
+        }
+
+        // Escape regex special characters
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Clear search highlights
+        function clearSearch() {
+            const content = document.getElementById('content');
+            if (originalContent !== null) {
+                content.innerHTML = originalContent;
+                originalContent = null;
+            }
+            searchMatches = [];
+            currentMatchIndex = -1;
+        }
+
+        // Highlight current match
+        function highlightCurrentMatch() {
+            // Remove current highlighting from all matches
+            searchMatches.forEach(match => {
+                match.classList.remove('search-highlight-current');
+                match.classList.add('search-highlight');
+            });
+
+            // Highlight current match
+            if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
+                const currentMatch = searchMatches[currentMatchIndex];
+                currentMatch.classList.remove('search-highlight');
+                currentMatch.classList.add('search-highlight-current');
+
+                // Update counter
+                const searchCounter = document.getElementById('searchCounter');
+                searchCounter.textContent = `Resultado ${currentMatchIndex + 1} de ${searchMatches.length}`;
+            }
+        }
+
+        // Scroll to current match
+        function scrollToCurrentMatch() {
+            if (currentMatchIndex >= 0 && currentMatchIndex < searchMatches.length) {
+                const currentMatch = searchMatches[currentMatchIndex];
+                const yOffset = -150;
+                const y = currentMatch.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+
+        // Update navigation buttons state
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevResult');
+            const nextBtn = document.getElementById('nextResult');
+
+            prevBtn.disabled = currentMatchIndex <= 0;
+            nextBtn.disabled = currentMatchIndex >= searchMatches.length - 1;
+        }
+
+        // Navigate to next search result
+        function nextSearchResult() {
+            if (currentMatchIndex < searchMatches.length - 1) {
+                currentMatchIndex++;
+                highlightCurrentMatch();
+                scrollToCurrentMatch();
+                updateNavigationButtons();
+            }
+        }
+
+        // Navigate to previous search result
+        function previousSearchResult() {
+            if (currentMatchIndex > 0) {
+                currentMatchIndex--;
+                highlightCurrentMatch();
+                scrollToCurrentMatch();
+                updateNavigationButtons();
+            }
         }
 
         // Progress Bar
