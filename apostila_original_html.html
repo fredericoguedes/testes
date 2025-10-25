@@ -98,6 +98,283 @@
             transform: translateY(-2px);
         }
 
+        /* Reading Mode */
+        .reading-mode .sidebar,
+        .reading-mode .header-actions > .btn-icon:not(.reading-mode-toggle),
+        .reading-mode .mobile-menu-btn,
+        .reading-mode .search-container,
+        .reading-mode .footer {
+            display: none !important;
+        }
+
+        .reading-mode .main-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem 3rem;
+            font-size: 1.1rem;
+            line-height: 1.9;
+        }
+
+        .reading-mode .header {
+            position: relative;
+            padding: 1rem 2rem;
+        }
+
+        .reading-mode .section {
+            margin-bottom: 3rem;
+        }
+
+        /* Source Management Panel */
+        .source-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-card);
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .source-panel.active {
+            right: 0;
+        }
+
+        .source-panel-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .source-panel-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .close-panel {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .close-panel:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .source-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .source-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .source-tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .source-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .source-tab:hover {
+            color: var(--primary-light);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .add-source-form {
+            background: var(--bg-main);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .source-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .source-item {
+            background: var(--bg-main);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .source-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .source-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .source-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0.5rem 0;
+        }
+
+        .source-details {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .source-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .btn-small {
+            padding: 0.4rem 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-copy {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-copy:hover {
+            opacity: 0.8;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            opacity: 0.8;
+        }
+
+        .citation-marker {
+            background: rgba(251, 191, 36, 0.3);
+            border-bottom: 2px solid var(--accent);
+            cursor: pointer;
+            padding: 0 2px;
+        }
+
+        .citation-marker:hover {
+            background: rgba(251, 191, 36, 0.5);
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
         /* Progress Bar */
         .progress-container {
             position: fixed;
@@ -506,6 +783,8 @@
                 </div>
             </div>
             <div class="header-actions">
+                <button class="btn-icon reading-mode-toggle" onclick="toggleReadingMode()" title="Modo de leitura">📖</button>
+                <button class="btn-icon" onclick="toggleSourcePanel()" title="Gestão de fontes">📚</button>
                 <button class="btn-icon" onclick="toggleDarkMode()" title="Alternar tema">🌓</button>
                 <button class="btn-icon" onclick="window.print()" title="Imprimir">🖨️</button>
             </div>
@@ -1458,6 +1737,89 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
+    <!-- Source Management Panel -->
+    <div class="source-panel" id="sourcePanel">
+        <div class="source-panel-header">
+            <h3>📚 Gestão de Fontes</h3>
+            <button class="close-panel" onclick="toggleSourcePanel()">✕</button>
+        </div>
+        <div class="source-panel-content">
+            <div class="source-tabs">
+                <button class="source-tab active" onclick="switchSourceTab('add')">Adicionar</button>
+                <button class="source-tab" onclick="switchSourceTab('list')">Minhas Fontes</button>
+                <button class="source-tab" onclick="switchSourceTab('export')">Exportar</button>
+            </div>
+
+            <!-- Add Source Tab -->
+            <div id="addSourceTab" class="tab-content active">
+                <div class="add-source-form">
+                    <div class="form-group">
+                        <label for="sourceType">Tipo de Fonte</label>
+                        <select id="sourceType">
+                            <option value="livro">Livro</option>
+                            <option value="artigo">Artigo</option>
+                            <option value="site">Website</option>
+                            <option value="lei">Lei/Norma</option>
+                            <option value="jurisprudencia">Jurisprudência</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceTitle">Título *</label>
+                        <input type="text" id="sourceTitle" placeholder="Título da fonte" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceAuthor">Autor(es)</label>
+                        <input type="text" id="sourceAuthor" placeholder="Nome do(s) autor(es)">
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceYear">Ano</label>
+                        <input type="text" id="sourceYear" placeholder="Ano de publicação">
+                    </div>
+                    <div class="form-group">
+                        <label for="sourcePublisher">Editora/Veículo</label>
+                        <input type="text" id="sourcePublisher" placeholder="Editora ou veículo de publicação">
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceUrl">URL</label>
+                        <input type="url" id="sourceUrl" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label for="sourceNotes">Notas</label>
+                        <textarea id="sourceNotes" placeholder="Observações sobre a fonte"></textarea>
+                    </div>
+                    <button class="btn-primary" onclick="addSource()">Adicionar Fonte</button>
+                </div>
+            </div>
+
+            <!-- List Sources Tab -->
+            <div id="listSourceTab" class="tab-content">
+                <div id="sourceList" class="source-list">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📚</div>
+                        <p>Nenhuma fonte adicionada ainda.</p>
+                        <p style="font-size: 0.9rem;">Adicione fontes para referência e citação.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Export Tab -->
+            <div id="exportSourceTab" class="tab-content">
+                <div class="export-options">
+                    <button class="btn-primary" onclick="exportSources('abnt')">Exportar em ABNT</button>
+                    <button class="btn-primary" onclick="exportSources('apa')">Exportar em APA</button>
+                    <button class="btn-primary" onclick="exportSources('json')">Exportar JSON</button>
+                    <button class="btn-primary" onclick="exportSources('bibtex')">Exportar BibTeX</button>
+                </div>
+                <div style="margin-top: 2rem; padding: 1rem; background: var(--bg-main); border-radius: 8px;">
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin: 0;">
+                        <strong>Dica:</strong> Você pode copiar individualmente cada fonte ou exportar todas de uma vez no formato desejado.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <p><strong>Curso Introdutório de IA Generativa para o MPGO</strong></p>
         <p style="margin: 0.5rem 0;">Aplicações Práticas para a Gestão Administrativa</p>
@@ -1540,14 +1902,14 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
         window.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('.section');
             let current = '';
-            
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop;
                 if (window.pageYOffset >= sectionTop - 200) {
                     current = section.getAttribute('id');
                 }
             });
-            
+
             document.querySelectorAll('.nav-item').forEach((item, index) => {
                 item.classList.remove('active');
                 const sectionIds = ['introducao', 'objetivos', 'modulo1', 'modulo2', 'modulo3', 'modulo4', 'glossario'];
@@ -1556,6 +1918,272 @@ Inclua todos os elementos essenciais do TAP segundo as melhores práticas do PMB
                 }
             });
         });
+
+        // Reading Mode
+        function toggleReadingMode() {
+            document.body.classList.toggle('reading-mode');
+            localStorage.setItem('readingMode', document.body.classList.contains('reading-mode'));
+        }
+
+        // Load saved reading mode preference
+        if (localStorage.getItem('readingMode') === 'true') {
+            document.body.classList.add('reading-mode');
+        }
+
+        // Source Management
+        let sources = JSON.parse(localStorage.getItem('sources')) || [];
+
+        function toggleSourcePanel() {
+            const panel = document.getElementById('sourcePanel');
+            panel.classList.toggle('active');
+        }
+
+        function switchSourceTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.source-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Add active class to selected tab
+            event.target.classList.add('active');
+
+            if (tabName === 'add') {
+                document.getElementById('addSourceTab').classList.add('active');
+            } else if (tabName === 'list') {
+                document.getElementById('listSourceTab').classList.add('active');
+                renderSourceList();
+            } else if (tabName === 'export') {
+                document.getElementById('exportSourceTab').classList.add('active');
+            }
+        }
+
+        function addSource() {
+            const type = document.getElementById('sourceType').value;
+            const title = document.getElementById('sourceTitle').value;
+            const author = document.getElementById('sourceAuthor').value;
+            const year = document.getElementById('sourceYear').value;
+            const publisher = document.getElementById('sourcePublisher').value;
+            const url = document.getElementById('sourceUrl').value;
+            const notes = document.getElementById('sourceNotes').value;
+
+            if (!title) {
+                alert('Por favor, preencha o título da fonte.');
+                return;
+            }
+
+            const source = {
+                id: Date.now(),
+                type,
+                title,
+                author,
+                year,
+                publisher,
+                url,
+                notes,
+                createdAt: new Date().toISOString()
+            };
+
+            sources.push(source);
+            localStorage.setItem('sources', JSON.stringify(sources));
+
+            // Clear form
+            document.getElementById('sourceTitle').value = '';
+            document.getElementById('sourceAuthor').value = '';
+            document.getElementById('sourceYear').value = '';
+            document.getElementById('sourcePublisher').value = '';
+            document.getElementById('sourceUrl').value = '';
+            document.getElementById('sourceNotes').value = '';
+
+            alert('Fonte adicionada com sucesso!');
+            switchSourceTab('list');
+        }
+
+        function renderSourceList() {
+            const sourceList = document.getElementById('sourceList');
+
+            if (sources.length === 0) {
+                sourceList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📚</div>
+                        <p>Nenhuma fonte adicionada ainda.</p>
+                        <p style="font-size: 0.9rem;">Adicione fontes para referência e citação.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            sourceList.innerHTML = sources.map(source => `
+                <div class="source-item">
+                    <div class="source-item-header">
+                        <span class="source-type">${getSourceTypeLabel(source.type)}</span>
+                    </div>
+                    <h4 class="source-title">${source.title}</h4>
+                    <div class="source-details">
+                        ${source.author ? `<div><strong>Autor:</strong> ${source.author}</div>` : ''}
+                        ${source.year ? `<div><strong>Ano:</strong> ${source.year}</div>` : ''}
+                        ${source.publisher ? `<div><strong>Editora/Veículo:</strong> ${source.publisher}</div>` : ''}
+                        ${source.url ? `<div><strong>URL:</strong> <a href="${source.url}" target="_blank" style="color: var(--primary);">${source.url}</a></div>` : ''}
+                        ${source.notes ? `<div style="margin-top: 0.5rem;"><strong>Notas:</strong> ${source.notes}</div>` : ''}
+                    </div>
+                    <div class="source-actions">
+                        <button class="btn-small btn-copy" onclick="copySourceCitation(${source.id})">Copiar ABNT</button>
+                        <button class="btn-small btn-copy" onclick="copySourceCitationAPA(${source.id})">Copiar APA</button>
+                        <button class="btn-small btn-delete" onclick="deleteSource(${source.id})">Excluir</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getSourceTypeLabel(type) {
+            const labels = {
+                'livro': 'Livro',
+                'artigo': 'Artigo',
+                'site': 'Website',
+                'lei': 'Lei/Norma',
+                'jurisprudencia': 'Jurisprudência',
+                'outro': 'Outro'
+            };
+            return labels[type] || type;
+        }
+
+        function formatSourceABNT(source) {
+            let citation = '';
+
+            if (source.author) {
+                citation += source.author.toUpperCase() + '. ';
+            }
+
+            citation += `<strong>${source.title}</strong>. `;
+
+            if (source.publisher) {
+                citation += source.publisher + ', ';
+            }
+
+            if (source.year) {
+                citation += source.year + '. ';
+            }
+
+            if (source.url) {
+                citation += `Disponível em: ${source.url}. `;
+            }
+
+            return citation;
+        }
+
+        function formatSourceAPA(source) {
+            let citation = '';
+
+            if (source.author) {
+                citation += source.author + ' ';
+            }
+
+            if (source.year) {
+                citation += `(${source.year}). `;
+            }
+
+            citation += `<em>${source.title}</em>. `;
+
+            if (source.publisher) {
+                citation += source.publisher + '. ';
+            }
+
+            if (source.url) {
+                citation += source.url;
+            }
+
+            return citation;
+        }
+
+        function copySourceCitation(sourceId) {
+            const source = sources.find(s => s.id === sourceId);
+            if (!source) return;
+
+            const citation = formatSourceABNT(source);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = citation;
+            const text = tempDiv.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Citação ABNT copiada para a área de transferência!');
+            });
+        }
+
+        function copySourceCitationAPA(sourceId) {
+            const source = sources.find(s => s.id === sourceId);
+            if (!source) return;
+
+            const citation = formatSourceAPA(source);
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = citation;
+            const text = tempDiv.textContent;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Citação APA copiada para a área de transferência!');
+            });
+        }
+
+        function deleteSource(sourceId) {
+            if (!confirm('Tem certeza que deseja excluir esta fonte?')) {
+                return;
+            }
+
+            sources = sources.filter(s => s.id !== sourceId);
+            localStorage.setItem('sources', JSON.stringify(sources));
+            renderSourceList();
+        }
+
+        function exportSources(format) {
+            if (sources.length === 0) {
+                alert('Não há fontes para exportar.');
+                return;
+            }
+
+            let content = '';
+            let filename = '';
+            let mimeType = 'text/plain';
+
+            if (format === 'abnt') {
+                content = sources.map(source => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = formatSourceABNT(source);
+                    return tempDiv.textContent;
+                }).join('\n\n');
+                filename = 'referencias-abnt.txt';
+            } else if (format === 'apa') {
+                content = sources.map(source => {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = formatSourceAPA(source);
+                    return tempDiv.textContent;
+                }).join('\n\n');
+                filename = 'referencias-apa.txt';
+            } else if (format === 'json') {
+                content = JSON.stringify(sources, null, 2);
+                filename = 'fontes.json';
+                mimeType = 'application/json';
+            } else if (format === 'bibtex') {
+                content = sources.map((source, index) => {
+                    return `@${source.type}{ref${index + 1},
+  title = {${source.title}},
+  author = {${source.author || 'Unknown'}},
+  year = {${source.year || 'n.d.'}},
+  publisher = {${source.publisher || ''}},
+  url = {${source.url || ''}}
+}`;
+                }).join('\n\n');
+                filename = 'referencias.bib';
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
     </script>
 </body>
 </html>
